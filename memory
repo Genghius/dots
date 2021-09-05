@@ -1,0 +1,1 @@
+awk 'NR == 1 {total=$2} NR == 3 {ava=$2} END {print int((total-ava)/1024) "/" int(total/1024) "M"}' /proc/meminfo

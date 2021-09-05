@@ -1,0 +1,4 @@
+temp=$(nvidia-smi | awk 'NR==10 {print($3)}')
+[ "$temp" ] && echo "GPU $temp"
+echo ""
+

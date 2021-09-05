@@ -1,0 +1,80 @@
+markup=pango
+
+# Memory usage
+#
+# The type defaults to "mem" if the instance is not specified.
+[volume-pulseaudio]
+label= 
+command=~/.config/i3blocks/volume
+color=#208273
+instance=Master
+interval=3
+
+[disk]
+label= 
+instance=/
+command=~/.config/i3blocks/disk
+color=#96c6f8
+interval=60
+
+#[pavucontrol]
+#full_text=
+#color=#208273
+#command=pavucontrol
+
+[memory]
+command=~/.config/i3blocks/memory
+color=#96c6f8
+interval=5
+
+[gpu]
+command=~/.config/i3blocks/gpu
+color=#96c6f8
+interval=5
+
+[CPU-temperature]
+label=CPU  
+command=~/.config/i3blocks/temperature
+color=#96c6f8
+interval=5
+
+[cpu_usage]
+label= 
+command=~/.config/i3blocks/cpu_usage
+interval=5
+color=#96c6f8
+
+[bandwidth]
+command=~/.config/i3blocks/bandwidth2
+color=#e07221
+interval=persist
+
+#[wifi]
+#label= 
+#instance=wlan0
+#color=#e07221
+#interval=3
+#this shite pc aint even has't' a wireless antena
+
+#[ssid]
+#command=echo "$(iwconfig wlan0 | grep ESSID | awk '{print $4}' | tr -d 'ESSID:"')"
+#color=#e07221
+#interval=5
+#error with this one iwconfig not found.
+
+# Date Time
+#
+[battery]
+command=~/.config/i3blocks/battery.sh
+label=⚡ 
+#instance=1
+interval=60
+
+[time]
+command=date '+%Y-%m-%d %H:%M:%S' && [ $button ] && curl -s wttr.in | sed '38q;s/\x1B\[[0-9;]\{1,\}[A-Za-z]//g' | dmenu -l 38
+interval=60
+
+[shutdown_menu]
+full_text= 
+command=~/.config/i3blocks/shutdown_menu -p rofi -c;
+color=#96c6f8
