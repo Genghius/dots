@@ -1,80 +1,285 @@
-markup=pango
+# Set keyboard layout
+exec_always setxkbmap -layout pt
 
-# Memory usage
-#
-# The type defaults to "mem" if the instance is not specified.
-[volume-pulseaudio]
-label= 
-command=~/.config/i3blocks/volume
-color=#208273
-instance=Master
-interval=3
+# Make caps lock usefull.
+#exec_always setxkbmap -option compose:caps
 
-[disk]
-label= 
-instance=/
-command=~/.config/i3blocks/disk
-color=#96c6f8
-interval=60
+# Display stuff
+#exec_always xrandr --output LVDS1 --primary --mode 1366x768 --pos 1920x196 --rotate normal --output DP1 --off --output HDMI1 --off --output VGA1 --off --output VIRTUAL1 --off --output DVI-D-1-0 --off --output HDMI-1-0 --mode 1920x1080 --pos 0x0 --rotate normal --output DP-1-0 --off --output DP-1-1 --off --output HDMI-1-1 --off --output HDMI-1-2 --off 
+exec_always xrandr --output LVDS1 --primary --mode 1366x768 --pos 1920x253 --rotate normal --output DP1 --off --output HDMI1 --mode 1920x1080 --pos 0x0 --rotate normal --output VGA1 --off --output VIRTUAL1 --off
+#exec_always 'ERROR=$(xrandr --output LVDS1 --primary --mode 1366x768 --pos 1920x196 --rotate normal --output DP1 --off --output HDMI1 --off --output VGA1 --off --output VIRTUAL1 --off --output DVI-D-1-0 --off --output HDMI-1-0 --mode 1920x1080 --pos 0x0 --rotate normal --output DP-1-0 --off --output DP-1-1 --off --output HDMI-1-1 --off --output HDMI-1-2 --off  2>&1 >/dev/null); [ "$ERROR" ] && xrandr --output LVDS1 --primary --mode 1366x768--pos 1920x253 --rotate normal --output DP1 --off --output HDMI1 --mode 1920x1080 --pos 0x0 --rotate normal --output VGA1 --off --output VIRTUAL1 --off'
+# lxsession
+#exec_always --no-startup-id lxsession
 
-#[pavucontrol]
-#full_text=
-#color=#208273
-#command=pavucontrol
+# Set wallpaper
+exec_always "o=$(cat ~/.Xresources); if [ !$o ]; then feh --bg-center ~/.config/i3/HK.png; fi"
+set $mod Mod4
 
-[memory]
-command=~/.config/i3blocks/memory
-color=#96c6f8
-interval=5
+# Keyboard changing bindings
+bindsym $mod+Mod1+a exec "setxkbmap -layout pt,apl -variant ,dyalog -option grp:switch && xmodmap -e 'keycode 35 = bracketright braceright rightarrow' && xmodmap -e 'keycode 34 = bracketleft braceleft leftarrow'"
+bindsym $mod+Mod1+Shift+a exec "setxkbmap -layout pt"
 
-[gpu]
-command=~/.config/i3blocks/gpu
-color=#96c6f8
-interval=5
+# Rofi keybinds (replacement to dmenu)
+bindsym $mod+Tab 		exec rofi -show window
+bindsym $mod+Shift+Tab		exec rofi -modi drun -show drun
 
-[CPU-temperature]
-label=CPU  
-command=~/.config/i3blocks/temperature
-color=#96c6f8
-interval=5
+# Font for window titles. Will also be used by the bar unless a different font
+# is used in the bar {} block below.
+font pango:monospace 8
 
-[cpu_usage]
-label= 
-command=~/.config/i3blocks/cpu_usage
-interval=5
-color=#96c6f8
+hide_edge_borders both
 
-[bandwidth]
-command=~/.config/i3blocks/bandwidth2
-color=#e07221
-interval=persist
+# Use Mouse+$mod to drag floating windows to their wanted position
+floating_modifier $mod
 
-#[wifi]
-#label= 
-#instance=wlan0
-#color=#e07221
-#interval=3
-#this shite pc aint even has't' a wireless antena
+# Mouse focus change stuff
+focus_follows_mouse no
 
-#[ssid]
-#command=echo "$(iwconfig wlan0 | grep ESSID | awk '{print $4}' | tr -d 'ESSID:"')"
-#color=#e07221
-#interval=5
-#error with this one iwconfig not found.
+# Start a terminal
+bindsym $mod+Return exec st
+bindsym $mod+Mod1+Return exec tabbed -c -r 2 st -w ''
+bindsym $mod+Shift+Return exec hyper
+bindsym $mod+Mod1+b exec feh --bg-fill ~/.config/i3/HK.png
+bindsym $mod+b exec tabbed -c surf -e
+bindsym $mod+Shift+b exec torify tabbed -c surf -e
 
-# Date Time
-#
-[battery]
-command=~/.config/i3blocks/battery.sh
-label=⚡ 
-#instance=1
-interval=60
+# Terminal scratchpad
+exec --no-startup-id st -n dropdown -e vim ~/foo.txt
+for_window [instance="dropdown"] floating enable
+for_window [instance="dropdown"] resize set 625 400
+for_window [instance="dropdown"] move scratchpad
+for_window [instance="dropdown"] border pixel 5
+bindsym $mod+g [instance="dropdown"] scratchpad show; [instance="dropdown"] move position center
 
-[time]
-command=date '+%Y-%m-%d %H:%M:%S' && [ $button ] && curl -s wttr.in | sed '38q;s/\x1B\[[0-9;]\{1,\}[A-Za-z]//g' | dmenu -l 38
-interval=60
+# Toggle i3-bar
+bindsym $mod+Mod1+Shift+b exec --no-startup-id ~/.local/bin/i3bartoggle
 
-[shutdown_menu]
-full_text= 
-command=~/.config/i3blocks/shutdown_menu -p rofi -c;
-color=#96c6f8
+# Take screenshot of focused window and save to ~/Pictures
+bindsym Print exec "scrot -ue 'mv $f ~/Pictures/screenshots/%Y-%m-%d_%H-%M-%S.png' && xclip -se c -t image/png -i ~/Pictures/screenshots/$(ls -r ~/Pictures/screenshots | sed 3q | sed '1d;2d')"
+
+# Take screenshot of area and save to same location
+bindsym --release Shift+Print exec "scrot -se 'mv $f ~/Pictures/screenshots/%Y-%m-%d_%H-%M-%S.png' && xclip -se c -t image/png -i ~/Pictures/screenshots/$(ls -r ~/Pictures/screenshots | sed 3q | sed '1d;2d')"
+
+# Record gifs of the screen owo
+bindsym --release $mod+F6 exec --no-startup-id "giph -s -t $(echo How long to record | dmenu) ~/Videos/recordings/$(date +%s).gif && notify-send 'Recording has stopped'"
+
+# Run dunst notification daemon
+exec_always --no-startup-id dunst
+
+# dmenu stuff
+bindsym $mod+p exec "~/.local/bin/dmenuproxy"
+bindsym $mod+Mod1+e exec "~/.local/bin/dmenukaomoji"
+# {♥‿♥} eylless
+bindsym $mod+Mod1+Shift+p exec "~/.local/bin/dmenupasta"
+bindsym $mod+y exec "~/.local/bin/youtudmenu"
+bindsym $mod+m exec "~/.local/bin/zathuraman"
+
+# Xresources from bg
+bindsym $mod+x exec "~/.local/bin/fehxresource && notify-send 'Xresources has been updated'"
+bindsym $mod+Mod1+x exec "echo '' > ~/.Xresources && xrdb ~/.Xresources && notify-send 'Xresources has been reset'"
+
+# ACCELERATE BG
+bindsym $mod+Mod1+m exec "$(pkill mpv && feh --bg-fill ~/.config/i3/HK.png) || mpv ~/Videos/ACCELERATORSINGS.mkv --wid=0 -loop --video-align-x=-1"
+
+# Dmenu prompt to select video/image to set as background
+bindsym $mod+Mod1+Shift+m exec "$(pkill mpv && feh --bg-fill ~/.config/i3/HK.png) || ~/.local/bin/videobackground"
+bindsym $mod+Mod1+Shift+w exec "~/.local/bin/imagebackground"
+
+# Notes bg / dmenu stuff
+bindsym $mod+n exec "~/.local/bin/fehbgnotes"
+bindsym $mod+Mod1+n exec "~/.local/bin/dmenunotes && ~/.local/bin/fehbgnotes"
+bindsym $mod+Mod1+Shift+n exec "~/.local/bin/notespop && ~/.local/bin/fehbgnotes"
+
+# Oneko
+bindsym $mod+Mod1+o exec pkill oneko || oneko -tofocus
+bindsym $mod+o exec pkill oneko || oneko
+
+# Screen lock
+bindsym $mod+Mod1+l exec i3lock-fancy -gp -f Comic-Sans-MS -t "Hacking of nasa in progress\ndo not disturb"
+
+# Picom stuff
+bindsym $mod+Mod1+p exec --no-startup-id pkill picom || picom -b
+
+# kill focused window
+bindsym $mod+Shift+q kill
+
+# start dmenu (a program launcher)
+bindsym $mod+d exec dmenu_run -nb "#2F2F2F" -nf lime -sb lime -sf "#0000FF"
+
+# There also is the (new) i3-dmenu-desktop which only displays applications
+# shipping a .desktop file. It is a wrapper around dmenu, so you need that
+# installed.
+# bindsym $mod+d exec --no-startup-id i3-dmenu-desktop
+
+# i3gaps stuff
+set $inner_gaps 15
+set $outer_gaps 15
+for_window [class="^.*"] border pixel 2
+gaps inner $inner_gaps
+gaps outer $outer_gaps
+bindsym $mod+s			gaps inner current plus 5
+bindsym $mod+Shift+s		gaps inner current minus 5
+bindsym $mod+z			gaps outer current plus 5
+bindsym $mod+Shift+z		gaps outer current minus 5
+bindsym $mod+Shift+d		gaps inner current set 0; gaps outer current set 0
+
+# change focus
+bindsym $mod+j focus left
+bindsym $mod+k focus down
+bindsym $mod+l focus up
+bindsym $mod+ccedilla focus right
+
+# alternatively, you can use the cursor keys:
+bindsym $mod+Left focus left
+bindsym $mod+Down focus down
+bindsym $mod+Up focus up
+bindsym $mod+Right focus right
+
+# move focused window
+bindsym $mod+Shift+j move left
+bindsym $mod+Shift+k move down
+bindsym $mod+Shift+l move up
+bindsym $mod+Shift+ccedilla move right
+
+# alternatively, you can use the cursor keys:
+bindsym $mod+Shift+Left move left
+bindsym $mod+Shift+Down move down
+bindsym $mod+Shift+Up move up
+bindsym $mod+Shift+Right move right
+
+# split in horizontal orientation
+bindsym $mod+h split h
+
+# split in vertical orientation
+bindsym $mod+v split v
+
+# enter fullscreen mode for the focused container
+bindsym $mod+f fullscreen toggle
+
+# change container layout (stacked, tabbed, toggle split)
+bindsym $mod+w layout stacking
+bindsym $mod+shift+t layout tabbed
+bindsym $mod+e layout toggle split
+
+# toggle tiling / floating
+bindsym $mod+Shift+space floating toggle
+
+# change focus between tiling / floating windows
+bindsym $mod+space focus mode_toggle
+
+# focus the parent container
+bindsym $mod+a focus parent
+
+# focus the child container
+#bindsym $mod+d focus child
+
+# switch to workspace
+bindsym $mod+1 workspace 1
+bindsym $mod+2 workspace 2
+bindsym $mod+3 workspace 3
+bindsym $mod+4 workspace 4
+bindsym $mod+5 workspace 5
+bindsym $mod+6 workspace 6
+bindsym $mod+7 workspace 7
+bindsym $mod+8 workspace 8
+bindsym $mod+9 workspace 9
+bindsym $mod+0 workspace 10
+
+# move focused container to workspace
+bindsym $mod+Shift+1 move container to workspace 1
+bindsym $mod+Shift+2 move container to workspace 2
+bindsym $mod+Shift+3 move container to workspace 3
+bindsym $mod+Shift+4 move container to workspace 4
+bindsym $mod+Shift+5 move container to workspace 5
+bindsym $mod+Shift+6 move container to workspace 6
+bindsym $mod+Shift+7 move container to workspace 7
+bindsym $mod+Shift+8 move container to workspace 8
+bindsym $mod+Shift+9 move container to workspace 9
+bindsym $mod+Shift+0 move container to workspace 10
+
+# reload the configuration file
+bindsym $mod+Shift+c reload
+
+# restart i3 inplace (preserves your layout/session, can be used to upgrade i3)
+bindsym $mod+Shift+r restart
+
+# exit i3 (logs you out of your X session)
+bindsym $mod+Shift+e exec "i3-nagbar -t warning -m 'You pressed the exit shortcut. Do you really want to exit i3? This will end your X session.' -b 'Yes, exit i3' 'i3-msg exit'"
+
+# resize window (you can also use the mouse for that)
+mode "resize" {
+        # These bindings trigger as soon as you enter the resize mode
+
+        # Pressing left will shrink the window’s width.
+        # Pressing right will grow the window’s width.
+        # Pressing up will shrink the window’s height.
+        # Pressing down will grow the window’s height.
+        bindsym h resize shrink width 1 px or 1 ppt
+        bindsym j resize grow height 1 px or 1 ppt
+        bindsym k resize shrink height 1 px or 1 ppt
+        bindsym l resize grow width 1 px or 1 ppt
+
+        # same bindings, but for the arrow keys
+        bindsym Left resize shrink width 10 px or 10 ppt
+        bindsym Down resize grow height 10 px or 10 ppt
+        bindsym Up resize shrink height 10 px or 10 ppt
+        bindsym Right resize grow width 10 px or 10 ppt
+
+        # back to normal: Enter or Escape
+        bindsym Return mode "default"
+        bindsym Escape mode "default"
+}
+
+bindsym $mod+r mode "resize"
+
+#set $bg-color			#11FF11
+#set $inactive-bg-color		#2F2F2F
+#set $text-color			#7777FF
+#set $inactive-text-color	#11FF11
+#set $urgent-bg-color		#E53935
+
+set_from_resource $bg-color			i3wm.color0	#11FF11
+set_from_resource $inactive-bg-color		i3wm.color4	#2F2F2F
+set_from_resource $text-color			i3wm.color1	#7777FF
+set_from_resource $inactive-text-color		i3wm.color2	#11FF11
+set_from_resource $urgent-bg-color		i3wm.color3	#E53935
+set_from_resource $urgent-text-color		i3wm.color5	#444477
+
+client.focused		$bg-color		$bg-color		$text-color		#00eeff
+client.unfocused	$inactive-bg-color	$inactive-bg-color	$inactive-text-color	#00eeff
+client.focused_inactive	$inactive-bg-color	$inactive-bg-color	$inactive-text-color	#00eeff
+client.urgent		$urgent-text-color	$urgent-bg-color	$urgent-text-color		#00eeff
+
+# Start i3bar to display a workspace bar (plus the system information i3status
+# finds out, if available)
+bar {
+	font pango:DejaVu Sans Mono 10
+        status_command slstatus -s #i3blocks
+	position top
+	mode dock
+	modifier none
+colors{
+background $inactive-bg-color ###9b6bdf44
+statusline $bg-color ###42e66cFF
+separator  $text-color ###373737FF
+
+focused_workspace  $bg-color $text-color $bg-color ###42e66c #9b6bdf #42e66c
+active_workspace   $bg-color $inactive-bg-color $bg-color ###262626 #75d7ec #efa554
+inactive_workspace $inactive-text-color $urgent-text-color $inactive-text-color ###262626 #262626 #efa554 
+urgent_workspace   $urgent-bg-color $inactive-text-color $urgent-bg-color ###efa554 #e64747 #efa554
+binding_mode       #2f343a #900000 #ffffff
+}
+}
+
+# Pulse Audio controls
+bindsym XF86AudioRaiseVolume exec --no-startup-id amixer set Master 3%+
+bindsym F3 exec --no-startup-id amixer set Master 3%+
+
+#increase sound volume
+bindsym XF86AudioLowerVolume exec --no-startup-id amixer set Master 3%-
+bindsym F2 exec --no-startup-id amixer set Master 3%-
+
+#decrease sound volume
+bindsym XF86AudioMute exec --no-startup-id amixer -D pulse set Master 1+ toggle
+bindsym F1 exec --no-startup-id amixer -D pulse set Master 1+ toggle
+# mute sound
